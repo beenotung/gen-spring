@@ -7,11 +7,12 @@ export function parse(input: string): ParseResult {
 }
 
 export type ParseResult = {
-  controller_list: Controller[]
+  scope_list: Scope[]
 }
 
-export type Controller = {
-  scope: string
+export type Scope = {
+  prefix: string
+  name: string
   api_list: API[]
 }
 
@@ -22,8 +23,8 @@ export type API = {
 }
 
 class Parser implements ParseResult {
-  controller_list: Controller[] = []
-  controller_map = new Map<string, Controller>()
+  scope_list: Scope[] = []
+  scope_map = new Map<string, Scope>()
   line_list: string[] = []
   parse(input: string) {
     input.split('\n').forEach(line => {
@@ -35,12 +36,12 @@ class Parser implements ParseResult {
       if (!line) return
       this.line_list.push(line)
     })
-    this.controller_list = []
+    this.scope_list = []
     for (;;) {
       let api = this.parseAPI()
       if (!api) break
-      let scope = this.parseScope(api.path)
-      let controller = this.getOrCreateController(scope)
+      let { prefix, name } = this.parseScope(api.path)
+      let controller = this.getOrCreateController(prefix, name)
       controller.api_list.push(api)
     }
   }
@@ -59,21 +60,22 @@ class Parser implements ParseResult {
       params: Array.from(params, match => match![1]),
     }
   }
-  parseScope(path: string): string {
-    let scope = path.match(/^\/(\w+)/)?.[1]
-    if (!scope)
+  parseScope(path: string) {
+    let prefix = path.match(/^\/(\w+)/)?.[1]
+    if (!prefix)
       throw new Error(
         'Invalid api path, expect to have controller prefix, e.g. /users , got: ' +
           path,
       )
-    return singular(scope)
+    let name = singular(prefix)
+    return { prefix, name }
   }
-  getOrCreateController(scope: string): Controller {
-    let controller = this.controller_map.get(scope)
-    if (controller) return controller
-    controller = { scope, api_list: [] }
-    this.controller_list.push(controller)
-    this.controller_map.set(scope, controller)
-    return controller
+  getOrCreateController(prefix: string, name: string): Scope {
+    let scope = this.scope_map.get(name)
+    if (scope) return scope
+    scope = { prefix, name, api_list: [] }
+    this.scope_list.push(scope)
+    this.scope_map.set(name, scope)
+    return scope
   }
 }

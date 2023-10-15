@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { API, Controller, parse } from './ast'
+import { API, Scope, parse } from './ast'
 
 let text = `
 GET /users
@@ -20,9 +20,10 @@ GET /users/:id/profile
 PATCH /users/:id/profile/:field
 	`
   let ast = parse(text)
-  let controller_list: Controller[] = [
+  let scope_list: Scope[] = [
     {
-      scope: 'user',
+      prefix: 'users',
+      name: 'user',
       api_list: [
         { method: 'GET', path: '/users', params: [] },
         { method: 'GET', path: '/users/:id/profile', params: ['id'] },
@@ -34,5 +35,5 @@ PATCH /users/:id/profile/:field
       ],
     },
   ]
-  expect(ast.controller_list).to.deep.equals(controller_list)
+  expect(ast.scope_list).to.deep.equals(scope_list)
 })
