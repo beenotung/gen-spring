@@ -11,6 +11,7 @@ export type ParseResult = {
 export type API = {
   method: string
   path: string
+  params: string[]
 }
 
 class Parser implements ParseResult {
@@ -41,6 +42,7 @@ class Parser implements ParseResult {
       throw new Error('Invalid line, expect [method] [path], got: ' + line)
     let method = match[1].toUpperCase()
     let path = match[2]
-    return { method, path }
+    let params = path.matchAll(/:(\w+)/g)
+    return { method, path, params: Array.from(params, match => match![1]) }
   }
 }
