@@ -1,0 +1,9 @@
+GET /users
+GET /users/:id/profile
+POST /users/login
+POST /users/register
+GET /notes
+GET /notes/:id
+POST /notes
+DELETE /notes/:id
+PATCH /notes/:id
