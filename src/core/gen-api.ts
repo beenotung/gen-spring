@@ -1,4 +1,4 @@
-import { Controller } from './ast'
+import { Scope } from './ast'
 import { join } from 'path'
 import { parse } from './ast'
 import { kebab_to_Pascal, kebab_to_camel, u_first } from '../utils/case'
@@ -14,21 +14,21 @@ export function genAPI(text: string) {
   const package_name_list = ['controller', 'service', 'model', 'dto', 'mapper']
   const app = setupDirectories(package_name_list)
 
-  for (const controller of result.controller_list) {
-    setupController(app, controller)
+  for (const scope of result.scope_list) {
+    setupController(app, scope)
   }
 }
 
-function setupController(app: SpringBootApplication, controller: Controller) {
+function setupController(app: SpringBootApplication, scope: Scope) {
   const dir = join(app.dir, 'controller')
-  const ClassName = kebab_to_Pascal(controller.scope)
-  const className = kebab_to_camel(controller.scope)
+  const ClassName = kebab_to_Pascal(scope.name)
+  const className = kebab_to_camel(scope.name)
   const file = join(dir, `${ClassName}Controller.java`)
 
   let body = ''
   const imports = new Set<string>()
 
-  for (const api of controller.api_list) {
+  for (const api of scope.api_list) {
     let method = api.method.toLowerCase()
     let Method = u_first(method)
     let name = method + 'TODO'
@@ -58,7 +58,7 @@ package ${app.package}.controller;
 ${importLines}
 
 @RestController
-@RequestMapping("${controller.scope}")
+@RequestMapping("${scope.name}")
 public class ${ClassName}Controller {
   @Autowired
   ${ClassName}Service ${className}Service;
