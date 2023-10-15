@@ -1,0 +1,29 @@
+{
+  "name": "gen-spring",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "test": "tsc --noEmit && npm run mocha",
+    "mocha": "ts-mocha src/**/*.spec.ts",
+    "build": "tsc -p ."
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "quick-erd": "^4.14.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.8",
+    "@types/mocha": "^10.0.2",
+    "@types/node": "^20.8.4",
+    "chai": "^4.3.10",
+    "mocha": "^10.2.0",
+    "ts-mocha": "^10.0.0",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.2.2"
+  }
+}
