@@ -17,6 +17,14 @@
   ],
   "author": "Beeno Tung <aabbcc1241@yahoo.com.hk> (https://beeno-tung.surge.sh)",
   "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beenotung/gen-spring.git"
+  },
+  "homepage": "https://github.com/beenotung/gen-spring#readme",
+  "bugs": {
+    "url": "https://github.com/beenotung/gen-spring/issues"
+  },
   "main": "index.js",
   "bin": {
     "gen-spring": "dist/cli/gen-api.js",
