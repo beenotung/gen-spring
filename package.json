@@ -26,7 +26,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "cd examples/java-project && ts-node ../../src/cli/gen-api.ts < api.txt",
+    "dev": "cd examples/java-project && erd-to-spring h2 < erd.txt && ts-node ../../src/cli/gen-api.ts < api.txt",
     "test": "tsc --noEmit && npm run mocha",
     "mocha": "ts-mocha src/**/*.spec.ts",
     "build": "npm run clean && npm run tsc",
@@ -36,7 +36,7 @@
   "dependencies": {
     "dotenv": "^16.3.1",
     "pluralize": "^8.0.0",
-    "quick-erd": "^4.17.1"
+    "quick-erd": "^4.17.2"
   },
   "devDependencies": {
     "@types/chai": "^4.3.8",

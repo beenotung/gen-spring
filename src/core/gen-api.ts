@@ -18,7 +18,7 @@ export function genAPI(text: string) {
 
   for (const scope of result.scope_list) {
     setupController(app, scope)
-    setupService(app, scope)
+    setupServiceInterface(app, scope)
   }
   setupMapper(app)
 }
@@ -37,24 +37,51 @@ function setupController(app: SpringBootApplication, scope: Scope) {
     let { Name, name } = setupControllerDTO(app, scope, api)
 
     let Method = u_first(api.method.toLowerCase())
-    let annotation = `@${Method}Mapping`
-    let path = api.path.replace('/' + scope.prefix, '').replace(/^\//, '')
+    let methodAnnotation = `@${Method}Mapping`
+    let path = api.path
+      .replace('/' + scope.prefix, '')
+      .replace(/^\//, '')
+      .split('/')
+      .map(part => (part[0] == ':' ? '{' + part.slice(1) + '}' : part))
+      .join('/')
     if (path) {
-      annotation += `("${path}")`
+      methodAnnotation += `("${path}")`
+    }
+    body += `
+
+  // ${api.method} ${api.path}
+  ${methodAnnotation}
+  public ${Name}ResponseDTO ${name}(`
+
+    let args: string[] = []
+
+    for (let param of api.params) {
+      let ClassName = param.match(/id$/i) ? 'Long' : 'String'
+      body += `@PathVariable ${ClassName} ${param}, `
+      args.push(param)
     }
 
-    body += `
-  ${annotation}
-  public ${Name}ResponseDTO ${name}(@RequestBody() ${Name}RequestDTO ${name}RequestDTO) {
-    // TODO add validation logic
-    return ${className}Service.${name}(${name}RequestDTO);
+    switch (api.method) {
+      case 'GET':
+      case 'DELETE':
+        body += `${Name}RequestDTO ${name}RequestDTO`
+        break
+      default:
+        body += `@RequestBody() ${Name}RequestDTO ${name}RequestDTO`
+        break
+    }
+    args.push(`${name}RequestDTO`)
+
+    body += `) {
+    // to add validation logic
+    return ${className}Service.${name}(${args.join(', ')});
   }`
   }
 
   let importLines = Array.from(imports).join('\n')
 
   importLines = `
-import ${app.package}.controller.${scope.name}.dto.*;
+import ${app.package}.dto.${scope.name}.*;
 import ${app.package}.service.${ClassName}Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -81,7 +108,45 @@ public class ${ClassName}Controller {
   writeSrcFileIfNeeded(file, code)
 }
 
-function setupService(app: SpringBootApplication, scope: Scope) {
+function setupServiceInterface(app: SpringBootApplication, scope: Scope) {
+  const dir = join(app.dir, 'service')
+  const ClassName = kebab_to_Pascal(scope.name)
+  const file = join(dir, `${ClassName}Service.java`)
+
+  let body = ''
+
+  for (let api of scope.api_list) {
+    let _name_ = apiToName(scope, api)
+    let Name = kebab_to_Pascal(_name_)
+    let name = kebab_to_camel(_name_)
+
+    let args: string[] = []
+
+    for (let param of api.params) {
+      let ClassName = param.match(/id$/i) ? 'Long' : 'String'
+      args.push(`${ClassName} ${param}`)
+    }
+    args.push(`${Name}RequestDTO ${name}RequestDTO`)
+
+    body += `
+
+  ${Name}ResponseDTO ${name}(${args.join(', ')});`
+  }
+
+  let code = `
+package ${app.package}.service;
+
+import ${app.package}.dto.${scope.name}.*;
+
+public interface ${ClassName}Service {
+  ${body.trim()}
+}
+`
+
+  writeSrcFileIfNeeded(file, code)
+}
+
+function setupServiceImpl(app: SpringBootApplication, scope: Scope) {
   const dir = join(app.dir, 'service')
   const ClassName = kebab_to_Pascal(scope.name)
   const className = kebab_to_camel(scope.name)
@@ -118,7 +183,7 @@ package ${app.package}.service;
 ${importLines.trim()}
 
 @Service
-public class ${ClassName}Service {`
+public interface ${ClassName}Service {`
 
   body = body.trim()
   if (body) {
@@ -140,10 +205,10 @@ function setupControllerDTO(
   let Name = kebab_to_Pascal(_name_)
   let name = kebab_to_camel(_name_)
 
-  const dir = join(app.dir, 'controller', scope.name, 'dto')
+  const dir = join(app.dir, 'dto', scope.name)
   mkdirSync(dir, { recursive: true })
 
-  let packageName = `${app.package}.controller.${scope.name}.dto`
+  let packageName = `${app.package}.dto.${scope.name}`
 
   setupDTOFile(dir, packageName, Name + 'RequestDTO')
   setupDTOFile(dir, packageName, Name + 'ResponseDTO')
@@ -153,6 +218,8 @@ function setupControllerDTO(
 
 function setupDTOFile(dir: string, packageName: string, ClassName: string) {
   const file = join(dir, `${ClassName}.java`)
+
+  if (existsSync(file)) return
 
   let code = `
 package ${packageName};
