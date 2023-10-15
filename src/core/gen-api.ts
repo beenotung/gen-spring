@@ -85,7 +85,6 @@ function setupController(app: SpringBootApplication, scope: Scope) {
 import ${app.package}.dto.${scope.name}.*;
 import ${app.package}.service.${ClassName}Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 ${importLines}
 `.trim()
