@@ -1,0 +1,10 @@
+user
+----
+id
+username text
+
+note
+----
+id
+user_id fk
+content text
