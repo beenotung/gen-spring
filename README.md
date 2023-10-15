@@ -4,6 +4,26 @@ Generate Spring Boot Controller, Service, DTO from API List in plain text
 
 [![npm Package Version](https://img.shields.io/npm/v/gen-spring)](https://www.npmjs.com/package/gen-spring)
 
+## Installation (optional)
+
+This package can be installed as devDependencies to lock specific version and reduce startup overhead
+
+```bash
+npm i -D gen-spring
+```
+
+## Usage
+
+`gen-spring [db] < [api-file]`
+
+The `db` argument can be skipped if `DB_CLIENT` exists in the environment variable or in the `.env` file
+
+### Usage Example
+
+```
+npx -y gen-spring h2 < api.txt
+```
+
 ## License
 
 This project is licensed with [BSD-2-Clause](./LICENSE)
