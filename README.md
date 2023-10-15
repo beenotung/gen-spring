@@ -3,9 +3,6 @@
 Generate Spring Boot Controller, Service, DTO from API List in plain text
 
 [![npm Package Version](https://img.shields.io/npm/v/gen-spring)](https://www.npmjs.com/package/gen-spring)
-[![Minified Package Size](https://img.shields.io/bundlephobia/min/gen-spring)](https://bundlephobia.com/package/gen-spring)
-[![Minified and Gzipped Package Size](https://img.shields.io/bundlephobia/minzip/gen-spring)](https://bundlephobia.com/package/gen-spring)
-[![npm Package Downloads](https://img.shields.io/npm/dm/gen-spring)](https://www.npmtrends.com/gen-spring)
 
 ## License
 
