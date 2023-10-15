@@ -19,6 +19,7 @@ export function genAPI(text: string) {
   for (const scope of result.scope_list) {
     setupController(app, scope)
     setupServiceInterface(app, scope)
+    setupServiceImpl(app, scope)
   }
   setupMapper(app)
 }
@@ -150,7 +151,9 @@ function setupServiceImpl(app: SpringBootApplication, scope: Scope) {
   const dir = join(app.dir, 'service')
   const ClassName = kebab_to_Pascal(scope.name)
   const className = kebab_to_camel(scope.name)
-  const file = join(dir, `${ClassName}Service.java`)
+  const file = join(dir, `${ClassName}ServiceImpl.java`)
+
+  if (existsSync(file)) return
 
   const repositoryFile = join(
     app.dir,
@@ -183,13 +186,14 @@ package ${app.package}.service;
 ${importLines.trim()}
 
 @Service
-public interface ${ClassName}Service {`
+public class ${ClassName}ServiceImpl implements ${ClassName}Service {`
 
   body = body.trim()
   if (body) {
     code += `
   ${body}`
   }
+
   code += `
 }`
 
