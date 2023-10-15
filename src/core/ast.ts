@@ -11,6 +11,7 @@ export type ParseResult = {
 }
 
 export type Scope = {
+  prefix: string
   name: string
   api_list: API[]
 }
@@ -39,8 +40,8 @@ class Parser implements ParseResult {
     for (;;) {
       let api = this.parseAPI()
       if (!api) break
-      let scope = this.parseScope(api.path)
-      let controller = this.getOrCreateController(scope)
+      let { prefix, name } = this.parseScope(api.path)
+      let controller = this.getOrCreateController(prefix, name)
       controller.api_list.push(api)
     }
   }
@@ -59,19 +60,20 @@ class Parser implements ParseResult {
       params: Array.from(params, match => match![1]),
     }
   }
-  parseScope(path: string): string {
-    let scope = path.match(/^\/(\w+)/)?.[1]
-    if (!scope)
+  parseScope(path: string) {
+    let prefix = path.match(/^\/(\w+)/)?.[1]
+    if (!prefix)
       throw new Error(
         'Invalid api path, expect to have controller prefix, e.g. /users , got: ' +
           path,
       )
-    return singular(scope)
+    let name = singular(prefix)
+    return { prefix, name }
   }
-  getOrCreateController(name: string): Scope {
+  getOrCreateController(prefix: string, name: string): Scope {
     let scope = this.scope_map.get(name)
     if (scope) return scope
-    scope = { name, api_list: [] }
+    scope = { prefix, name, api_list: [] }
     this.scope_list.push(scope)
     this.scope_map.set(name, scope)
     return scope

@@ -19,6 +19,7 @@
   "license": "BSD-2-Clause",
   "main": "index.js",
   "scripts": {
+    "dev": "cd examples/java-project && ts-node ../../src/cli/gen-api.ts < api.txt",
     "test": "tsc --noEmit && npm run mocha",
     "mocha": "ts-mocha src/**/*.spec.ts",
     "build": "tsc -p ."

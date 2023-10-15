@@ -22,6 +22,7 @@ PATCH /users/:id/profile/:field
   let ast = parse(text)
   let scope_list: Scope[] = [
     {
+      prefix: 'users',
       name: 'user',
       api_list: [
         { method: 'GET', path: '/users', params: [] },
