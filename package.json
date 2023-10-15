@@ -18,10 +18,19 @@
   "author": "Beeno Tung <aabbcc1241@yahoo.com.hk> (https://beeno-tung.surge.sh)",
   "license": "BSD-2-Clause",
   "main": "index.js",
+  "bin": {
+    "gen-spring": "dist/cli/gen-api.js",
+    "gen-api": "dist/cli/gen-api.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "tsc --noEmit && npm run mocha",
     "mocha": "ts-mocha src/**/*.spec.ts",
-    "build": "tsc -p ."
+    "build": "npm run clean && npm run tsc",
+    "clean": "rimraf dist",
+    "tsc": "tsc -p ."
   },
   "dependencies": {
     "dotenv": "^16.3.1",
@@ -35,6 +44,7 @@
     "@types/pluralize": "^0.0.31",
     "chai": "^4.3.10",
     "mocha": "^10.2.0",
+    "rimraf": "^5.0.5",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
