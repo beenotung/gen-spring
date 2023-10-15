@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 
-import { env } from '../db/env'
-import { textToSpring } from '../db/text-to-spring'
-import { detectDBClient } from '../utils/cli'
-
 /* eslint-disable no-console */
+
+import { genAPI } from '../core/gen-api'
 
 function main() {
   let text = ''
@@ -15,7 +13,7 @@ function main() {
         console.error('missing api text from stdin')
         process.exit(1)
       }
-      textToSpring(dbClient, text)
+      genAPI(text)
     })
 }
 

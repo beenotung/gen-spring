@@ -1,3 +1,5 @@
+import { singular } from 'pluralize'
+
 export function parse(input: string): ParseResult {
   let parser = new Parser()
   parser.parse(input)
@@ -5,6 +7,11 @@ export function parse(input: string): ParseResult {
 }
 
 export type ParseResult = {
+  controller_list: Controller[]
+}
+
+export type Controller = {
+  scope: string
   api_list: API[]
 }
 
@@ -15,7 +22,8 @@ export type API = {
 }
 
 class Parser implements ParseResult {
-  api_list: API[] = []
+  controller_list: Controller[] = []
+  controller_map = new Map<string, Controller>()
   line_list: string[] = []
   parse(input: string) {
     input.split('\n').forEach(line => {
@@ -27,11 +35,13 @@ class Parser implements ParseResult {
       if (!line) return
       this.line_list.push(line)
     })
-    this.api_list = []
+    this.controller_list = []
     for (;;) {
       let api = this.parseAPI()
-      if (api) this.api_list.push(api)
-      else break
+      if (!api) break
+      let scope = this.parseScope(api.path)
+      let controller = this.getOrCreateController(scope)
+      controller.api_list.push(api)
     }
   }
   parseAPI(): API | null {
@@ -43,6 +53,27 @@ class Parser implements ParseResult {
     let method = match[1].toUpperCase()
     let path = match[2]
     let params = path.matchAll(/:(\w+)/g)
-    return { method, path, params: Array.from(params, match => match![1]) }
+    return {
+      method,
+      path,
+      params: Array.from(params, match => match![1]),
+    }
+  }
+  parseScope(path: string): string {
+    let scope = path.match(/^\/(\w+)/)?.[1]
+    if (!scope)
+      throw new Error(
+        'Invalid api path, expect to have controller prefix, e.g. /users , got: ' +
+          path,
+      )
+    return singular(scope)
+  }
+  getOrCreateController(scope: string): Controller {
+    let controller = this.controller_map.get(scope)
+    if (controller) return controller
+    controller = { scope, api_list: [] }
+    this.controller_list.push(controller)
+    this.controller_map.set(scope, controller)
+    return controller
   }
 }

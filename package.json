@@ -25,12 +25,14 @@
   },
   "dependencies": {
     "dotenv": "^16.3.1",
-    "quick-erd": "^4.14.0"
+    "pluralize": "^8.0.0",
+    "quick-erd": "^4.17.1"
   },
   "devDependencies": {
     "@types/chai": "^4.3.8",
     "@types/mocha": "^10.0.2",
-    "@types/node": "^20.8.4",
+    "@types/node": "^18.18.5",
+    "@types/pluralize": "^0.0.31",
     "chai": "^4.3.10",
     "mocha": "^10.2.0",
     "ts-mocha": "^10.0.0",
