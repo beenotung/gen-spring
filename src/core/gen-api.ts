@@ -250,7 +250,7 @@ import java.lang.reflect.Field;
 public class MapperUtils {
   public static <From, To> void copy(From fromObject, To toObject) {
     Class<?> fromClass = fromObject.getClass();
-    for (Field toField : toObject.getClass().getFields()) {
+    for (Field toField : toObject.getClass().getDeclaredField()) {
       try {
         String fieldName = toField.getName();
         Field fromField = fromClass.getDeclaredField(fieldName);
