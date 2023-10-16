@@ -27,14 +27,14 @@ public class UserController {
 
   // POST /users/login
   @PostMapping("login")
-  public PostUserLoginResponseDTO postUserLogin(@RequestBody() PostUserLoginRequestDTO postUserLoginRequestDTO) {
+  public PostUserLoginResponseDTO postUserLogin(@RequestBody PostUserLoginRequestDTO postUserLoginRequestDTO) {
     // to add validation logic
     return userService.postUserLogin(postUserLoginRequestDTO);
   }
 
   // POST /users/register
   @PostMapping("register")
-  public PostUserRegisterResponseDTO postUserRegister(@RequestBody() PostUserRegisterRequestDTO postUserRegisterRequestDTO) {
+  public PostUserRegisterResponseDTO postUserRegister(@RequestBody PostUserRegisterRequestDTO postUserRegisterRequestDTO) {
     // to add validation logic
     return userService.postUserRegister(postUserRegisterRequestDTO);
   }

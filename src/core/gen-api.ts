@@ -69,7 +69,7 @@ function setupController(app: SpringBootApplication, scope: Scope) {
         body += `${Name}RequestDTO ${name}RequestDTO`
         break
       default:
-        body += `@RequestBody() ${Name}RequestDTO ${name}RequestDTO`
+        body += `@RequestBody ${Name}RequestDTO ${name}RequestDTO`
         break
     }
     args.push(`${name}RequestDTO`)

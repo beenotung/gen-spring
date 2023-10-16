@@ -27,7 +27,7 @@ public class NoteController {
 
   // POST /notes
   @PostMapping
-  public PostNoteResponseDTO postNote(@RequestBody() PostNoteRequestDTO postNoteRequestDTO) {
+  public PostNoteResponseDTO postNote(@RequestBody PostNoteRequestDTO postNoteRequestDTO) {
     // to add validation logic
     return noteService.postNote(postNoteRequestDTO);
   }
@@ -41,7 +41,7 @@ public class NoteController {
 
   // PATCH /notes/:id
   @PatchMapping("{id}")
-  public PatchNoteByIdResponseDTO patchNoteById(@PathVariable Long id, @RequestBody() PatchNoteByIdRequestDTO patchNoteByIdRequestDTO) {
+  public PatchNoteByIdResponseDTO patchNoteById(@PathVariable Long id, @RequestBody PatchNoteByIdRequestDTO patchNoteByIdRequestDTO) {
     // to add validation logic
     return noteService.patchNoteById(id, patchNoteByIdRequestDTO);
   }
