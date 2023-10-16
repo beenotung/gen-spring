@@ -1,4 +1,4 @@
-package com.example.javaproject.controller.user;
+package com.example.javaproject.controller;
 
 import com.example.javaproject.dto.user.*;
 import com.example.javaproject.service.UserService;

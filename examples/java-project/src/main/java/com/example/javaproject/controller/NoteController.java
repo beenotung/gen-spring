@@ -1,4 +1,4 @@
-package com.example.javaproject.controller.note;
+package com.example.javaproject.controller;
 
 import com.example.javaproject.dto.note.*;
 import com.example.javaproject.service.NoteService;

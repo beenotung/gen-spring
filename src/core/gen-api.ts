@@ -26,7 +26,7 @@ export function genAPI(text: string) {
 }
 
 function setupController(app: SpringBootApplication, scope: Scope) {
-  const dir = join(app.dir, 'controller', scope.name)
+  const dir = join(app.dir, 'controller')
   mkdirSync(dir, { recursive: true })
   const ClassName = kebab_to_Pascal(scope.name)
   const className = kebab_to_camel(scope.name)
@@ -82,7 +82,7 @@ function setupController(app: SpringBootApplication, scope: Scope) {
     classCode.appendInClass(body)
   }
 
-  classCode.setPackage(`${app.package}.controller.${scope.name}`)
+  classCode.setPackage(`${app.package}.controller`)
 
   classCode.addImportLines(
     `
