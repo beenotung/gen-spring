@@ -35,8 +35,6 @@ function setupController(app: SpringBootApplication, scope: Scope) {
   let classCode = new ClassCode({ file, ClassName: `${ClassName}Controller` })
 
   for (const api of scope.api_list) {
-    if (classCode.hasLine(`  // ${api.method} ${api.path}`)) continue
-
     let { Name, name } = setupControllerDTO(app, scope, api)
 
     let Method = u_first(api.method.toLowerCase())
@@ -50,6 +48,9 @@ function setupController(app: SpringBootApplication, scope: Scope) {
     if (path) {
       methodAnnotation += `("${path}")`
     }
+
+    if (classCode.hasLine(methodAnnotation)) continue
+
     let body = `
   // ${api.method} ${api.path}
   ${methodAnnotation}
