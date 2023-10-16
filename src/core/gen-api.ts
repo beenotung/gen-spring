@@ -173,8 +173,8 @@ import org.springframework.stereotype.Service;
     importLines = `
 import ${app.package}.repository.${ClassName}Repository;
 import org.springframework.beans.factory.annotation.Autowired;
-${importLines}
-`.trim()
+${importLines.trim()}
+`
     body += `
   @Autowired
   ${ClassName}Repository ${className}Repository;
