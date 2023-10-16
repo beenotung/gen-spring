@@ -1,6 +1,6 @@
 # gen-spring
 
-Generate Spring Boot Controller, Service, DTO from API List in plain text
+Generate Spring Boot Controller, Service, DTO from API list in plain text
 
 [![npm Package Version](https://img.shields.io/npm/v/gen-spring)](https://www.npmjs.com/package/gen-spring)
 
@@ -16,7 +16,7 @@ npm i -D gen-spring
 
 `gen-spring [db] < [api-file]`
 
-The `db` argument can be skipped if `DB_CLIENT` exists in the environment variable or in the `.env` file
+The `db` argument can be skipped if `DB_CLIENT` exists in the environment variable or in the `.env` file.
 
 ### Usage Example
 
