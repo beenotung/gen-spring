@@ -9,6 +9,7 @@ import {
 } from 'quick-erd/dist/db/text-to-spring'
 import { existsSync, mkdirSync } from 'fs'
 import { apiToName } from './api'
+import { ClassCode } from './code'
 
 export function genAPI(text: string) {
   const result = parse(text)
@@ -31,10 +32,11 @@ function setupController(app: SpringBootApplication, scope: Scope) {
   const className = kebab_to_camel(scope.name)
   const file = join(dir, `${ClassName}Controller.java`)
 
-  let body = ''
-  const imports = new Set<string>()
+  let classCode = new ClassCode({ file, ClassName: `${ClassName}Controller` })
 
   for (const api of scope.api_list) {
+    if (classCode.hasLine(`  // ${api.method} ${api.path}`)) continue
+
     let { Name, name } = setupControllerDTO(app, scope, api)
 
     let Method = u_first(api.method.toLowerCase())
@@ -48,8 +50,7 @@ function setupController(app: SpringBootApplication, scope: Scope) {
     if (path) {
       methodAnnotation += `("${path}")`
     }
-    body += `
-
+    let body = `
   // ${api.method} ${api.path}
   ${methodAnnotation}
   public ${Name}ResponseDTO ${name}(`
@@ -77,35 +78,36 @@ function setupController(app: SpringBootApplication, scope: Scope) {
     // to add validation logic
     return ${className}Service.${name}(${args.join(', ')});
   }`
+
+    classCode.appendInClass(body)
   }
 
-  let importLines = Array.from(imports).join('\n')
+  classCode.setPackage(`${app.package}.controller.${scope.name}`)
 
-  importLines = `
+  classCode.addImportLines(
+    `
 import ${app.package}.dto.${scope.name}.*;
 import ${app.package}.service.${ClassName}Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-${importLines}
-`.trim()
+`.trim(),
+  )
 
-  const code =
-    `
-package ${app.package}.controller.${scope.name};
-
-${importLines}
-
+  if (!classCode.hasLine(`@RestController`)) {
+    classCode.addBeforeClass(
+      `
 @RestController
 @RequestMapping("${scope.prefix}")
-public class ${ClassName}Controller {
-  @Autowired
-  ${ClassName}Service ${className}Service;
+`.trim(),
+    )
+  }
 
-  ${body.trim()}
-`.trim() +
-    `
-}`
-  writeSrcFileIfNeeded(file, code)
+  if (!classCode.hasLine(`${ClassName}Service ${className}Service;`)) {
+    classCode.prependInClass(`  ${ClassName}Service ${className}Service;`)
+    classCode.prependInClass(`  @Autowired`)
+  }
+
+  classCode.save()
 }
 
 function setupServiceInterface(app: SpringBootApplication, scope: Scope) {
