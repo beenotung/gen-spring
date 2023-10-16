@@ -26,6 +26,9 @@ export class ClassCode {
   hasLine(pattern: string | RegExp): boolean {
     return this.lines.some(line => line.match(pattern))
   }
+  hasTrimmedLine(pattern: string): boolean {
+    return this.lines.some(line => line.trim() == pattern)
+  }
   setPackage(packageName: string) {
     if (this.hasLine(/^package /)) return
     this.trimCode()

@@ -49,7 +49,7 @@ function setupController(app: SpringBootApplication, scope: Scope) {
       methodAnnotation += `("${path}")`
     }
 
-    if (classCode.hasLine(methodAnnotation)) continue
+    if (classCode.hasTrimmedLine(methodAnnotation)) continue
 
     let body = `
   // ${api.method} ${api.path}
