@@ -255,6 +255,7 @@ public class MapperUtils {
         Field fromField = fromClass.getDeclaredField(fieldName);
         fromField.setAccessible(true);
         Object fieldValue = fromField.get(fromObject);
+        toField.setAccessible(true);
         toField.set(toObject, fieldValue);
       } catch (NoSuchFieldException e) {
         // skip missing fields
