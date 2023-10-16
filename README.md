@@ -24,6 +24,81 @@ The `db` argument can be skipped if `DB_CLIENT` exists in the environment variab
 npx -y gen-spring h2 < api.txt
 ```
 
+### Example API text
+
+```
+POST /users/login
+POST /notes
+DELETE /notes/:id
+```
+
+This will generates `UserController` class, `NoteController` class, `UserService` interface, `NoteService` interface and corresponding methods and DTO.
+
+Part of generate code:
+
+**NoteController.java**:
+
+```java
+package com.example.javaproject.controller.note;
+
+import com.example.javaproject.dto.note.*;
+import com.example.javaproject.service.NoteService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("notes")
+public class NoteController {
+  @Autowired
+  NoteService noteService;
+
+  // POST /notes
+  @PostMapping
+  public PostNoteResponseDTO postNote(@RequestBody PostNoteRequestDTO postNoteRequestDTO) {
+    // to add validation logic
+    return noteService.postNote(postNoteRequestDTO);
+  }
+
+  // DELETE /notes/:id
+  @DeleteMapping("{id}")
+  public DeleteNoteByIdResponseDTO deleteNoteById(@PathVariable Long id, DeleteNoteByIdRequestDTO deleteNoteByIdRequestDTO) {
+    // to add validation logic
+    return noteService.deleteNoteById(id, deleteNoteByIdRequestDTO);
+  }
+}
+
+```
+
+**NoteService.java**:
+
+```java
+package com.example.javaproject.service;
+
+import com.example.javaproject.dto.note.*;
+
+public interface NoteService {
+  PostNoteResponseDTO postNote(PostNoteRequestDTO postNoteRequestDTO);
+
+  DeleteNoteByIdResponseDTO deleteNoteById(Long id, DeleteNoteByIdRequestDTO deleteNoteByIdRequestDTO);
+}
+```
+
+**NoteServiceImpl.java**:
+
+```java
+package com.example.javaproject.service;
+
+import com.example.javaproject.repository.NoteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class NoteServiceImpl implements NoteService {
+  @Autowired
+  NoteRepository noteRepository;
+}
+```
+
 ## License
 
 This project is licensed with [BSD-2-Clause](./LICENSE)
