@@ -14,7 +14,13 @@ import { ClassCode } from './code'
 export function genAPI(text: string) {
   const result = parse(text)
 
-  const package_name_list = ['controller', 'service', 'model', 'mapper']
+  const package_name_list = [
+    'controller',
+    'service',
+    'model',
+    'mapper',
+    'validator',
+  ]
   const app = setupDirectories(package_name_list)
 
   for (const scope of result.scope_list) {
@@ -23,6 +29,7 @@ export function genAPI(text: string) {
     setupServiceImpl(app, scope)
   }
   setupMapper(app)
+  setupValidator(app)
 }
 
 function setupController(app: SpringBootApplication, scope: Scope) {
@@ -91,6 +98,8 @@ import ${app.package}.dto.${scope.name}.*;
 import ${app.package}.service.${ClassName}Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import static ${app.package}.validator.ValidatorUtils.assertNoNull;
 `.trim(),
   )
 
@@ -265,6 +274,66 @@ public class MapperUtils {
       }
     }
   }
+}
+`
+
+  writeSrcFileIfNeeded(file, code)
+}
+
+function setupValidator(app: SpringBootApplication) {
+  const dir = join(app.dir, 'validator')
+  const ClassName = 'ValidatorUtils'
+  const file = join(dir, `${ClassName}.java`)
+
+  let code = `
+package ${app.package}.validator;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ValidatorUtils {
+    public static void assertNoNull(Object object, String objectName) {
+        List<String> missingFields = collectNullFields(object);
+        if (!missingFields.isEmpty()) {
+            fail(HttpStatus.BAD_REQUEST, "missing " + missingFields + " in " + objectName);
+        }
+    }
+
+    public static void assertNoNull(String objectName, Object object) {
+        assertNoNull(object, objectName);
+    }
+
+    public static List<String> collectNullFields(Object object) {
+        List<String> missingFields = new ArrayList<>();
+        for (Field field : object.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            Object value = null;
+            try {
+                value = field.get(object);
+            } catch (IllegalAccessException e) {
+                // this should not happen
+                throw new RuntimeException(e);
+            }
+            if (value == null) {
+                missingFields.add(field.getName());
+                continue;
+            }
+            if (!value.getClass().getName().startsWith("java.")) {
+                for (String subFieldName : collectNullFields(value)) {
+                    missingFields.add(field.getName() + "." + subFieldName);
+                }
+            }
+        }
+        return missingFields;
+    }
+
+    public static void fail(HttpStatus httpStatus, String message) {
+        throw new ResponseStatusException(httpStatus, message);
+    }
 }
 `
 
