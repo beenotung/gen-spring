@@ -1,6 +1,6 @@
 {
   "name": "gen-spring",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "Generate Spring Boot Controller, Service, DTO from API List in plain text",
   "keywords": [
     "code-gen",
