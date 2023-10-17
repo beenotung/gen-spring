@@ -84,7 +84,3 @@ export class ClassCode {
     writeSrcFileIfNeeded(file, code)
   }
 }
-
-function trimLines(lines: string): string[] {
-  return lines.trim().split('\n')
-}
