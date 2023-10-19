@@ -34,6 +34,9 @@ public class ValidatorUtils {
                 missingFields.add(field.getName());
                 continue;
             }
+            if (value.getClass().isEnum() ) {
+                continue;
+            }
             if (!value.getClass().getName().startsWith("java.")) {
                 for (String subFieldName : collectNullFields(value)) {
                     missingFields.add(field.getName() + "." + subFieldName);
