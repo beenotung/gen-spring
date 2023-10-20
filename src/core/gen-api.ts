@@ -59,9 +59,9 @@ function setupController(app: SpringBootApplication, scope: Scope) {
     if (classCode.hasTrimmedLine(methodAnnotation)) continue
 
     let body = `
-  // ${api.method} ${api.path}
-  ${methodAnnotation}
-  public ${Name}ResponseDTO ${name}(`
+    // ${api.method} ${api.path}
+    ${methodAnnotation}
+    public ${Name}ResponseDTO ${name}(`
 
     let args: string[] = []
 
@@ -83,9 +83,9 @@ function setupController(app: SpringBootApplication, scope: Scope) {
     args.push(`${name}RequestDTO`)
 
     body += `) {
-    // to add validation logic
-    return ${className}Service.${name}(${args.join(', ')});
-  }`
+        // to add validation logic
+        return ${className}Service.${name}(${args.join(', ')});
+    }`
 
     classCode.appendInClass(body)
   }
@@ -113,8 +113,8 @@ import static ${app.package}.validator.ValidatorUtils.assertNoNull;
   }
 
   if (!classCode.hasLine(`${ClassName}Service ${className}Service;`)) {
-    classCode.prependInClass(`  ${ClassName}Service ${className}Service;`)
-    classCode.prependInClass(`  @Autowired`)
+    classCode.prependInClass(`    ${ClassName}Service ${className}Service;`)
+    classCode.prependInClass(`    @Autowired`)
   }
 
   classCode.save()
@@ -142,7 +142,7 @@ function setupServiceInterface(app: SpringBootApplication, scope: Scope) {
 
     body += `
 
-  ${Name}ResponseDTO ${name}(${args.join(', ')});`
+    ${Name}ResponseDTO ${name}(${args.join(', ')});`
   }
 
   let code = `
@@ -151,7 +151,7 @@ package ${app.package}.service;
 import ${app.package}.dto.${scope.name}.*;
 
 public interface ${ClassName}Service {
-  ${body.trim()}
+    ${body.trim()}
 }
 `
 
@@ -186,8 +186,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 ${importLines.trim()}
 `
     body += `
-  @Autowired
-  ${ClassName}Repository ${className}Repository;
+    @Autowired
+    ${ClassName}Repository ${className}Repository;
 `
   }
 
@@ -202,7 +202,7 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {`
   body = body.trim()
   if (body) {
     code += `
-  ${body}`
+    ${body}`
   }
 
   code += `
@@ -257,23 +257,23 @@ package ${app.package}.mapper;
 import java.lang.reflect.Field;
 
 public class MapperUtils {
-  public static <From, To> void copy(From fromObject, To toObject) {
-    Class<?> fromClass = fromObject.getClass();
-    for (Field toField : toObject.getClass().getDeclaredFields()) {
-      try {
-        String fieldName = toField.getName();
-        Field fromField = fromClass.getDeclaredField(fieldName);
-        fromField.setAccessible(true);
-        Object fieldValue = fromField.get(fromObject);
-        toField.setAccessible(true);
-        toField.set(toObject, fieldValue);
-      } catch (NoSuchFieldException e) {
-        // skip missing fields
-      } catch (IllegalAccessException e) {
-        // this should never occur
-      }
+    public static <From, To> void copy(From fromObject, To toObject) {
+        Class<?> fromClass = fromObject.getClass();
+        for (Field toField : toObject.getClass().getDeclaredFields()) {
+            try {
+                String fieldName = toField.getName();
+                Field fromField = fromClass.getDeclaredField(fieldName);
+                fromField.setAccessible(true);
+                Object fieldValue = fromField.get(fromObject);
+                toField.setAccessible(true);
+                toField.set(toObject, fieldValue);
+            } catch (NoSuchFieldException e) {
+                // skip missing fields
+            } catch (IllegalAccessException e) {
+                // this should never occur
+            }
+        }
     }
-  }
 }
 `
 
@@ -322,7 +322,7 @@ public class ValidatorUtils {
                 missingFields.add(field.getName());
                 continue;
             }
-            if (value.getClass().isEnum() ) {
+            if (value.getClass().isEnum()) {
                 continue;
             }
             if (!value.getClass().getName().startsWith("java.")) {
