@@ -84,6 +84,7 @@ function setupController(app: SpringBootApplication, scope: Scope) {
 
     body += `) {
         // to add validation logic
+        assertNoNull(requestDTO, "req.body");
         return ${className}Service.${name}(${args.join(', ')});
     }`
 
