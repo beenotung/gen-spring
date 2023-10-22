@@ -74,13 +74,13 @@ function setupController(app: SpringBootApplication, scope: Scope) {
     switch (api.method) {
       case 'GET':
       case 'DELETE':
-        body += `${Name}RequestDTO ${name}RequestDTO`
+        body += `${Name}RequestDTO requestDTO`
         break
       default:
-        body += `@RequestBody ${Name}RequestDTO ${name}RequestDTO`
+        body += `@RequestBody ${Name}RequestDTO requestDTO`
         break
     }
-    args.push(`${name}RequestDTO`)
+    args.push(`requestDTO`)
 
     body += `) {
     // to add validation logic
@@ -138,7 +138,7 @@ function setupServiceInterface(app: SpringBootApplication, scope: Scope) {
       let ClassName = param.match(/id$/i) ? 'Long' : 'String'
       args.push(`${ClassName} ${param}`)
     }
-    args.push(`${Name}RequestDTO ${name}RequestDTO`)
+    args.push(`${Name}RequestDTO requestDTO`)
 
     body += `
 

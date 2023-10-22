@@ -3,11 +3,11 @@ package com.example.javaproject.service;
 import com.example.javaproject.dto.user.*;
 
 public interface UserService {
-    GetUsersResponseDTO getUsers(GetUsersRequestDTO getUsersRequestDTO);
+    GetUsersResponseDTO getUsers(GetUsersRequestDTO requestDTO);
 
-    GetUserProfileByIdResponseDTO getUserProfileById(Long id, GetUserProfileByIdRequestDTO getUserProfileByIdRequestDTO);
+    GetUserProfileByIdResponseDTO getUserProfileById(Long id, GetUserProfileByIdRequestDTO requestDTO);
 
-    PostUserLoginResponseDTO postUserLogin(PostUserLoginRequestDTO postUserLoginRequestDTO);
+    PostUserLoginResponseDTO postUserLogin(PostUserLoginRequestDTO requestDTO);
 
-    PostUserRegisterResponseDTO postUserRegister(PostUserRegisterRequestDTO postUserRegisterRequestDTO);
+    PostUserRegisterResponseDTO postUserRegister(PostUserRegisterRequestDTO requestDTO);
 }
