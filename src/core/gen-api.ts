@@ -16,8 +16,8 @@ import { existsSync, mkdirSync, readdirSync, statSync } from 'fs'
 import { apiToName } from './api'
 import { ClassCode } from './code'
 
-export function genAPI(text: string) {
-  const result = parse(text)
+export function genAPI(input: { text: string; setup_json_property: boolean }) {
+  const result = parse(input.text)
 
   const package_name_list = [
     'controller',
@@ -35,7 +35,9 @@ export function genAPI(text: string) {
   }
   setupMapper(app)
   setupValidator(app)
-  setupDTOJsonProperty(app)
+  if (input.setup_json_property) {
+    setupDTOJsonProperty(app)
+  }
 }
 
 function setupController(app: SpringBootApplication, scope: Scope) {
