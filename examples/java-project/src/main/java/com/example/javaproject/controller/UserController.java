@@ -1,10 +1,10 @@
 package com.example.javaproject.controller;
 
-
 import com.example.javaproject.dto.user.*;
 import com.example.javaproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import static com.example.javaproject.validator.ValidatorUtils.assertNoNull;
 
 @RestController

@@ -1,6 +1,5 @@
 package com.example.javaproject.controller;
 
-
 import com.example.javaproject.dto.note.*;
 import com.example.javaproject.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
