@@ -59,9 +59,9 @@ function setupController(app: SpringBootApplication, scope: Scope) {
     if (classCode.hasTrimmedLine(methodAnnotation)) continue
 
     let body = `
-  // ${api.method} ${api.path}
-  ${methodAnnotation}
-  public ${Name}ResponseDTO ${name}(`
+    // ${api.method} ${api.path}
+    ${methodAnnotation}
+    public ${Name}ResponseDTO ${name}(`
 
     let args: string[] = []
 
@@ -83,9 +83,9 @@ function setupController(app: SpringBootApplication, scope: Scope) {
     args.push(`requestDTO`)
 
     body += `) {
-    // to add validation logic
-    return ${className}Service.${name}(${args.join(', ')});
-  }`
+        // to add validation logic
+        return ${className}Service.${name}(${args.join(', ')});
+    }`
 
     classCode.appendInClass(body)
   }
