@@ -288,6 +288,7 @@ function setupValidator(app: SpringBootApplication) {
   let code = `
 package ${app.package}.validator;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -319,7 +320,7 @@ public class ValidatorUtils {
                 throw new RuntimeException(e);
             }
             if (value == null) {
-                missingFields.add(field.getName());
+                missingFields.add(getFieldName(field));
                 continue;
             }
             if (value.getClass().isEnum()) {
@@ -327,11 +328,20 @@ public class ValidatorUtils {
             }
             if (!value.getClass().getName().startsWith("java.")) {
                 for (String subFieldName : collectNullFields(value)) {
-                    missingFields.add(field.getName() + "." + subFieldName);
+                    missingFields.add(getFieldName(field) + "." + subFieldName);
                 }
             }
         }
         return missingFields;
+    }
+
+    static String getFieldName(Field field) {
+        JsonProperty annotation = field.getAnnotation(JsonProperty.class);
+        String name = annotation == null ? null : annotation.value();
+        if (name != null && name.length() > 0) {
+            return name;
+        }
+        return field.getName();
     }
 
     public static void fail(HttpStatus httpStatus, String message) {

@@ -5,6 +5,7 @@ import com.example.javaproject.dto.user.*;
 import com.example.javaproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import static com.example.javaproject.validator.ValidatorUtils.assertNoNull;
 
 @RestController
 @RequestMapping("users")
@@ -37,6 +38,7 @@ public class UserController {
     @PostMapping("register")
     public PostUserRegisterResponseDTO postUserRegister(@RequestBody PostUserRegisterRequestDTO postUserRegisterRequestDTO) {
         // to add validation logic
+        assertNoNull(postUserRegisterRequestDTO, "req.body");
         return userService.postUserRegister(postUserRegisterRequestDTO);
     }
 }
