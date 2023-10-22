@@ -1,13 +1,18 @@
 import { API, Scope } from './ast'
-import { join } from 'path'
+import { basename, join } from 'path'
 import { parse } from './ast'
-import { kebab_to_Pascal, kebab_to_camel, u_first } from '../utils/case'
+import {
+  kebab_to_Pascal,
+  kebab_to_camel,
+  u_first,
+  camel_to_snake,
+} from '../utils/case'
 import { writeSrcFileIfNeeded } from 'quick-erd/dist/utils/file'
 import {
   SpringBootApplication,
   setupDirectories,
 } from 'quick-erd/dist/db/text-to-spring'
-import { existsSync, mkdirSync } from 'fs'
+import { existsSync, mkdirSync, readdirSync, statSync } from 'fs'
 import { apiToName } from './api'
 import { ClassCode } from './code'
 
@@ -30,6 +35,7 @@ export function genAPI(text: string) {
   }
   setupMapper(app)
   setupValidator(app)
+  setupDTOJsonProperty(app)
 }
 
 function setupController(app: SpringBootApplication, scope: Scope) {
@@ -352,4 +358,44 @@ public class ValidatorUtils {
 `
 
   writeSrcFileIfNeeded(file, code)
+}
+
+function setupDTOJsonProperty(app: SpringBootApplication) {
+  let dir = join(app.dir, 'dto')
+  setupDTOJsonPropertyDir(app, dir)
+}
+
+function setupDTOJsonPropertyDir(app: SpringBootApplication, dir: string) {
+  for (let filename of readdirSync(dir)) {
+    let file = join(dir, filename)
+    let stat = statSync(file)
+    if (stat.isDirectory()) {
+      setupDTOJsonPropertyDir(app, file)
+    } else if (filename.endsWith('.java') && stat.isFile()) {
+      let ClassName = filename.slice(0, filename.length - '.java'.length)
+      let classCode = new ClassCode({ file, ClassName })
+      setupDTOJsonPropertyFile(classCode)
+    }
+  }
+}
+
+function setupDTOJsonPropertyFile(classCode: ClassCode) {
+  classCode.addImportLines(
+    'import com.fasterxml.jackson.annotation.JsonProperty;',
+  )
+  let lines = classCode.lines
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i]
+    let lastLine = lines[i - 1]
+    if (lastLine && lastLine.includes('@JsonProperty')) continue
+    let match = line.match(/public ([\w<>.]+) (\w+);/)
+    if (!match) continue
+    let fieldClass = match[1]
+    let fieldName = match[2]
+    if (fieldClass == 'class') continue
+    let field_name = camel_to_snake(fieldName)
+    lines.splice(i, 0, `    @JsonProperty("${field_name}")`)
+    i++
+  }
+  classCode.save()
 }
