@@ -1,5 +1,5 @@
 import { API, Scope } from './ast'
-import { basename, join } from 'path'
+import { join } from 'path'
 import { parse } from './ast'
 import {
   kebab_to_Pascal,
