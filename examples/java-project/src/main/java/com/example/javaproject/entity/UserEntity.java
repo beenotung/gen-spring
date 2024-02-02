@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class UserEntity {
     @Id
     @GeneratedValue
-    @Column
+    @Column(name = "`id`")
     private Long id;
 
     @Column(name = "`username`", nullable = false)

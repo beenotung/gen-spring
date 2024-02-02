@@ -15,3 +15,22 @@ export function kebab_to_camel(name: string): string {
 export function u_first(name: string): string {
   return name.slice(0, 1).toUpperCase() + name.slice(1)
 }
+
+export function camel_to_snake(name: string) {
+  let result = ''
+  let isLastUpperCase = false
+  for (let i = 0; i < name.length; i++) {
+    let c = name[i]
+    let isUpperCase = 'A' <= c && c <= 'Z'
+    if (isUpperCase) {
+      if (!isLastUpperCase) {
+        result += '_'
+      }
+      result += c.toLowerCase()
+    } else {
+      result += c
+    }
+    isLastUpperCase = isUpperCase
+  }
+  return result
+}

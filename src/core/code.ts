@@ -39,12 +39,45 @@ export class ClassCode {
       .trim()
       .split('\n')
       .filter(line => !line || !this.lines.includes(line))
-    this.trimCode()
     let index = this.lines.findIndex(line => line.startsWith('import '))
     if (index == -1) {
       this.lines.splice(1, 0, '', ...importLines)
     } else {
       this.lines.splice(index, 0, ...importLines)
+    }
+    this.trimEmptyLinesAroundImports()
+  }
+  trimEmptyLinesAroundImports() {
+    let lines = this.lines
+
+    // find index after package
+    let index = 0
+    if (lines[0]?.startsWith('package ')) {
+      index = 1
+    }
+
+    // remove empty lines before imports
+    while (
+      index + 1 < lines.length &&
+      lines[index] == '' &&
+      lines[index + 1] == ''
+    ) {
+      lines.splice(index, 1)
+    }
+
+    // find last import line
+    index++
+    while (index < lines.length && lines[index].startsWith('import ')) {
+      index++
+    }
+
+    // remove empty lines after imports
+    while (
+      index + 1 < lines.length &&
+      lines[index] == '' &&
+      lines[index + 1] == ''
+    ) {
+      lines.splice(index, 1)
     }
   }
   private setClassName() {

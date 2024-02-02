@@ -1,18 +1,23 @@
 import { API, Scope } from './ast'
 import { join } from 'path'
 import { parse } from './ast'
-import { kebab_to_Pascal, kebab_to_camel, u_first } from '../utils/case'
+import {
+  kebab_to_Pascal,
+  kebab_to_camel,
+  u_first,
+  camel_to_snake,
+} from '../utils/case'
 import { writeSrcFileIfNeeded } from 'quick-erd/dist/utils/file'
 import {
   SpringBootApplication,
   setupDirectories,
 } from 'quick-erd/dist/db/text-to-spring'
-import { existsSync, mkdirSync } from 'fs'
+import { existsSync, mkdirSync, readdirSync, statSync } from 'fs'
 import { apiToName } from './api'
 import { ClassCode } from './code'
 
-export function genAPI(text: string) {
-  const result = parse(text)
+export function genAPI(input: { text: string; setup_json_property: boolean }) {
+  const result = parse(input.text)
 
   const package_name_list = [
     'controller',
@@ -30,6 +35,9 @@ export function genAPI(text: string) {
   }
   setupMapper(app)
   setupValidator(app)
+  if (input.setup_json_property) {
+    setupDTOJsonProperty(app)
+  }
 }
 
 function setupController(app: SpringBootApplication, scope: Scope) {
@@ -74,16 +82,17 @@ function setupController(app: SpringBootApplication, scope: Scope) {
     switch (api.method) {
       case 'GET':
       case 'DELETE':
-        body += `${Name}RequestDTO ${name}RequestDTO`
+        body += `${Name}RequestDTO requestDTO`
         break
       default:
-        body += `@RequestBody ${Name}RequestDTO ${name}RequestDTO`
+        body += `@RequestBody ${Name}RequestDTO requestDTO`
         break
     }
-    args.push(`${name}RequestDTO`)
+    args.push(`requestDTO`)
 
     body += `) {
         // to add validation logic
+        assertNoNull(requestDTO, "req.body");
         return ${className}Service.${name}(${args.join(', ')});
     }`
 
@@ -113,8 +122,8 @@ import static ${app.package}.validator.ValidatorUtils.assertNoNull;
   }
 
   if (!classCode.hasLine(`${ClassName}Service ${className}Service;`)) {
-    classCode.prependInClass(`    ${ClassName}Service ${className}Service;`)
-    classCode.prependInClass(`    @Autowired`)
+    classCode.prependInClass(`  ${ClassName}Service ${className}Service;`)
+    classCode.prependInClass(`  @Autowired`)
   }
 
   classCode.save()
@@ -138,7 +147,7 @@ function setupServiceInterface(app: SpringBootApplication, scope: Scope) {
       let ClassName = param.match(/id$/i) ? 'Long' : 'String'
       args.push(`${ClassName} ${param}`)
     }
-    args.push(`${Name}RequestDTO ${name}RequestDTO`)
+    args.push(`${Name}RequestDTO requestDTO`)
 
     body += `
 
@@ -186,8 +195,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 ${importLines.trim()}
 `
     body += `
-    @Autowired
-    ${ClassName}Repository ${className}Repository;
+  @Autowired
+  ${ClassName}Repository ${className}Repository;
 `
   }
 
@@ -202,7 +211,7 @@ public class ${ClassName}ServiceImpl implements ${ClassName}Service {`
   body = body.trim()
   if (body) {
     code += `
-    ${body}`
+  ${body}`
   }
 
   code += `
@@ -288,6 +297,7 @@ function setupValidator(app: SpringBootApplication) {
   let code = `
 package ${app.package}.validator;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -319,7 +329,7 @@ public class ValidatorUtils {
                 throw new RuntimeException(e);
             }
             if (value == null) {
-                missingFields.add(field.getName());
+                missingFields.add(getFieldName(field));
                 continue;
             }
             if (value.getClass().isEnum()) {
@@ -327,11 +337,20 @@ public class ValidatorUtils {
             }
             if (!value.getClass().getName().startsWith("java.")) {
                 for (String subFieldName : collectNullFields(value)) {
-                    missingFields.add(field.getName() + "." + subFieldName);
+                    missingFields.add(getFieldName(field) + "." + subFieldName);
                 }
             }
         }
         return missingFields;
+    }
+
+    static String getFieldName(Field field) {
+        JsonProperty annotation = field.getAnnotation(JsonProperty.class);
+        String name = annotation == null ? null : annotation.value();
+        if (name != null && name.length() > 0) {
+            return name;
+        }
+        return field.getName();
     }
 
     public static void fail(HttpStatus httpStatus, String message) {
@@ -341,4 +360,44 @@ public class ValidatorUtils {
 `
 
   writeSrcFileIfNeeded(file, code)
+}
+
+function setupDTOJsonProperty(app: SpringBootApplication) {
+  let dir = join(app.dir, 'dto')
+  setupDTOJsonPropertyDir(app, dir)
+}
+
+function setupDTOJsonPropertyDir(app: SpringBootApplication, dir: string) {
+  for (let filename of readdirSync(dir)) {
+    let file = join(dir, filename)
+    let stat = statSync(file)
+    if (stat.isDirectory()) {
+      setupDTOJsonPropertyDir(app, file)
+    } else if (filename.endsWith('.java') && stat.isFile()) {
+      let ClassName = filename.slice(0, filename.length - '.java'.length)
+      let classCode = new ClassCode({ file, ClassName })
+      setupDTOJsonPropertyFile(classCode)
+    }
+  }
+}
+
+function setupDTOJsonPropertyFile(classCode: ClassCode) {
+  classCode.addImportLines(
+    'import com.fasterxml.jackson.annotation.JsonProperty;',
+  )
+  let lines = classCode.lines
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i]
+    let lastLine = lines[i - 1]
+    if (lastLine && lastLine.includes('@JsonProperty')) continue
+    let match = line.match(/public ([\w<>.]+) (\w+);/)
+    if (!match) continue
+    let fieldClass = match[1]
+    let fieldName = match[2]
+    if (fieldClass == 'class') continue
+    let field_name = camel_to_snake(fieldName)
+    lines.splice(i, 0, `    @JsonProperty("${field_name}")`)
+    i++
+  }
+  classCode.save()
 }

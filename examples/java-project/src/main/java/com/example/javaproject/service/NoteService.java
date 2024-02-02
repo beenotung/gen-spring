@@ -3,13 +3,13 @@ package com.example.javaproject.service;
 import com.example.javaproject.dto.note.*;
 
 public interface NoteService {
-    GetNotesResponseDTO getNotes(GetNotesRequestDTO getNotesRequestDTO);
+    GetNotesResponseDTO getNotes(GetNotesRequestDTO requestDTO);
 
-    GetNoteByIdResponseDTO getNoteById(Long id, GetNoteByIdRequestDTO getNoteByIdRequestDTO);
+    GetNoteByIdResponseDTO getNoteById(Long id, GetNoteByIdRequestDTO requestDTO);
 
-    PostNoteResponseDTO postNote(PostNoteRequestDTO postNoteRequestDTO);
+    PostNoteResponseDTO postNote(PostNoteRequestDTO requestDTO);
 
-    DeleteNoteByIdResponseDTO deleteNoteById(Long id, DeleteNoteByIdRequestDTO deleteNoteByIdRequestDTO);
+    DeleteNoteByIdResponseDTO deleteNoteById(Long id, DeleteNoteByIdRequestDTO requestDTO);
 
-    PatchNoteByIdResponseDTO patchNoteById(Long id, PatchNoteByIdRequestDTO patchNoteByIdRequestDTO);
+    PatchNoteByIdResponseDTO patchNoteById(Long id, PatchNoteByIdRequestDTO requestDTO);
 }
