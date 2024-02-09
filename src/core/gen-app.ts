@@ -44,9 +44,13 @@ export async function setupSpringBootApplication() {
   let project_name = basename(process.cwd())
   let group_id = package_parts.slice(0, package_parts.length - 1).join('.')
 
-  let app_class =
-    kebab_to_Pascal(project_name.replace(/^[0-9]+/, '')).replace(/App$/, '') +
-    'Application'
+  let app_class = kebab_to_Pascal(project_name.replace(/^[0-9]+/, ''))
+  if (app_class.endsWith('App')) {
+    app_class = app_class.replace(/App$/, '')
+  } else if (app_class.endsWith('Project')) {
+    app_class = app_class.replace(/Project$/, '')
+  }
+  app_class += 'Application'
 
   mkdirSync(join('src', 'main', 'resources'), { recursive: true })
   mkdirSync(join('src', 'main', 'java', ...package_parts), { recursive: true })
