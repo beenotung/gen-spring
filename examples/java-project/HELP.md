@@ -19,3 +19,10 @@ The following guides illustrate how to use some features concretely:
 - [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
 - [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
 - [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
+
+### Code Generation
+
+The follow tools support automatic code generation:
+
+- [Generate API files](https://github.com/beenotung/gen-spring/blob/master/README.md)
+- [Generate database files](https://github.com/beenotung/quick-erd/blob/master/README.md)
