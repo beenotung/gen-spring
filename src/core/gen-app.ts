@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync } from 'fs'
 import { ask } from 'npm-init-helper'
 import { basename, join } from 'path'
-import { snake_to_Pascal } from 'quick-erd/dist/utils/case'
+import { kebab_to_Pascal } from '../utils/case'
 
 async function askUntilValid(
   fn: () => Promise<string | void>,
@@ -45,9 +45,8 @@ export async function setupSpringBootApplication() {
   let group_id = package_parts.slice(0, package_parts.length - 1).join('.')
 
   let app_class =
-    snake_to_Pascal(
-      project_name.replace(/^[0-9]+/, '').replace(/-/g, '_'),
-    ).replace(/App$/, '') + 'Application'
+    kebab_to_Pascal(project_name.replace(/^[0-9]+/, '')).replace(/App$/, '') +
+    'Application'
 
   mkdirSync(join('src', 'main', 'resources'), { recursive: true })
   mkdirSync(join('src', 'main', 'java', ...package_parts), { recursive: true })
