@@ -4,9 +4,14 @@
 
 import { env } from '../core/env'
 import { genAPI } from '../core/gen-api'
+import { setupSpringBootApplication } from '../core/gen-app'
 
-function main() {
+async function main() {
+  await setupSpringBootApplication()
   let setup_json_property = env.SETUP_JSON_PROPERTY != 'false'
+  if (process.stdin.isTTY) {
+    console.error('Reading api from stdin... (Please pipe api text to stdin)')
+  }
   let text = ''
   process.stdin
     .on('data', chunk => (text += chunk))
